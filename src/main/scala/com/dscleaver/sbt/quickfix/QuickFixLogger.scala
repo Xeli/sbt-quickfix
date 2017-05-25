@@ -14,6 +14,8 @@ class QuickFixLogger(val output: File, vimExec: String, enableServer: Boolean) e
   import QuickFixLogger._
   import VimInteraction._
 
+  var lines = 0
+
   def log(level: Level.Value, message: => String): Unit = level match {
     case Level.Info => handleInfoMessage(message)
     case Level.Error => handleErrorMessage(message)
@@ -38,15 +40,22 @@ class QuickFixLogger(val output: File, vimExec: String, enableServer: Boolean) e
 
   def notifyVim() {
     call(vimExec, "<esc>:cgetfile %s<cr>".format(output.toString))
-    call(vimExec, ":cw<cr>")
+    val size = Math.min(10, Math.max(1, lines))
+    call(vimExec, ":cwindow %d<cr>".format(size))
     ()
   }
 
   def handleInfoMessage(message: String): Unit = ()
 
-  def handleErrorMessage(message: String): Unit = append(output, "error", message)
+  def handleErrorMessage(message: String): Unit = {
+    lines += 1
+    append(output, "error", message)
+  }
 
-  def handleWarnMessage(message: String): Unit = append(output, "warn", message)
+  def handleWarnMessage(message: String): Unit = {
+    lines += 1
+    append(output, "warn", message)
+  }
 
   def control(event: ControlEvent.Value, message: => String): Unit = ()
 
