@@ -10,7 +10,7 @@ licenses += ("BSD 3-Clause", url("https://opensource.org/licenses/BSD-3-Clause")
 
 versionWithGit
 
-//version := "0.4.1-LOCAL"
+version := "0.4.1-LOCAL"
 
 git.baseVersion := "0.4.1"
 
