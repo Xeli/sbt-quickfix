@@ -21,17 +21,28 @@ class QuickFixLogger(val output: File, vimExec: String, enableServer: Boolean) e
     case _ => handleDebugMessage(message)
   }
 
-  def handleDebugMessage(message: String): Unit =
-    if (enableServer && message.toLowerCase.contains("compilation failed")) {
-      val _ = call(vimExec, "<esc>:cfile %s<cr>".format(output.toString))
+  def handleDebugMessage(message: String): Unit = {
+    if (message.toLowerCase.contains("initial source changes:")) {
+      resetFile()
+      notifyVim()
     }
-
-  def handleInfoMessage(message: String): Unit = {
-    if(message startsWith "Compiling") {
-      IO.delete(output)
-      IO.touch(List(output))
-    } else ()
+    if (enableServer && message.toLowerCase.contains("compilation failed")) {
+      notifyVim()
+    }
   }
+
+  def resetFile() {
+    IO.delete(output)
+    IO.touch(List(output))
+  }
+
+  def notifyVim() {
+    call(vimExec, "<esc>:cgetfile %s<cr>".format(output.toString))
+    call(vimExec, ":cw<cr>")
+    ()
+  }
+
+  def handleInfoMessage(message: String): Unit = ()
 
   def handleErrorMessage(message: String): Unit = append(output, "error", message)
 
@@ -44,5 +55,4 @@ class QuickFixLogger(val output: File, vimExec: String, enableServer: Boolean) e
   def success(message: => String): Unit = ()
 
   def trace(t: => Throwable): Unit = ()
-
 }
