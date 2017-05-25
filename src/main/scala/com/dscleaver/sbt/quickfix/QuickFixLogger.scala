@@ -4,7 +4,7 @@ import sbt._
 
 object QuickFixLogger {
   def append(output: File, prefix: String, message: String): Unit =
-    IO.append(output, "[%s] %s\n".format(prefix, message))
+    IO.append(output, "[%s] %s\n".format(prefix, message.replace('\n', ' ')))
 
   def append(output: File, prefix: String, file: File, line: Int, message: String): Unit =
     append(output, prefix, "%s:%d: %s".format(file, line, message))
